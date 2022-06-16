@@ -8,6 +8,50 @@ import stage
 
 import constants
 
+def menu_scene():
+    # this function is the main game scene
+
+    # image banks for CircuitPython
+    image_bank_background = stage.Bank.from_bmp16("space_aliens_background.bmp")
+
+    # add text objects
+    text = []
+    text1 = stage.Text(width=29, height=12, font=None, palette=constants.RED_PALETTE, buffer=None)
+    text1.move(20,10)
+    text1.text("MT Game Studio")
+    text.append(text1)
+
+    text2 = stage.Text(width=29, height=12, font=None, palette=constants.RED_PALETTE, buffer=None)
+    text2.move(40, 110)
+    text2.text("PRESS START")
+    text.append(text2)
+
+    # set the backgorund image to 0 in the image bank
+    # and the size (10x8 tiles of size 16x16)
+    background = stage.Grid(image_bank_background, 10, 8)
+
+    # create a stage for the background to show up on
+    # and set the frame rate to 60fps
+    game = stage.Stage(ugame.display, constants.FPS)
+    
+    # set the layers of all sprites, items show up in order
+    game.layers = text + [background]
+    
+    # render all sprites
+    # most likely you will only render the background once per game scene
+    game.render_block()
+
+    # repeat forever, game loop
+    while True:
+        # get user input
+        keys = ugame.buttons.get_pressed()
+
+        if keys & ugame.K_START != 0:
+            game_scene()
+
+        # redraw Sprites
+        game.tick()
+
 def game_scene():
     # this function is the main game scene
 
@@ -70,21 +114,21 @@ def game_scene():
         if keys & ugame.K_X != 0:
             pass
         if keys & ugame.K_START != 0:
-            print("Start")
+            pass
         if keys & ugame.K_SELECT != 0:
-            print("Select")
+            pass
         if keys & ugame.K_RIGHT != 0:
             # move the ship to the right 
             # if it hits the border it will wrap to the other side of the screen
             if ship.x <= constants.SCREEN_X - constants.SPRITE_SIZE:
-                ship.move(ship.x + .15, ship.y)
+                ship.move(ship.x + 1, ship.y)
             else:
                 ship.move(0, ship.y)
         if keys & ugame.K_LEFT != 0:
             # move ship to the left
             # if it hits the border it will wrap to the other side of the screen
             if ship.x >= 0:
-                ship.move(ship.x - .15, ship.y)
+                ship.move(ship.x - 1, ship.y)
             else:  
                 ship.move(constants.SCREEN_X - constants.SPRITE_SIZE, ship.y)
         if keys & ugame.K_UP != 0:
@@ -99,7 +143,7 @@ def game_scene():
 
         # redraw Sprites
         game.render_sprites([ship] + [alien])
-        game.tick
+        game.tick()
 
 if __name__ == "__main__":
-    game_scene()
+    menu_scene()
