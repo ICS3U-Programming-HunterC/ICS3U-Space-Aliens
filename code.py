@@ -124,6 +124,9 @@ def menu_scene():
 def game_scene():
     # this function is the main game scene
 
+    # score
+    score = 0
+
     def show_alien():
         # this function takes an alien from off screen and moves it on screen
         for alien_number in range(len(aliens)):
@@ -147,6 +150,12 @@ def game_scene():
     sound.stop()
     sound.mute(False)
 
+    # get boom sound ready
+    boom_sound = open("boom.wav", 'rb')
+    sound = ugame.audio
+    sound.stop()
+    sound.mute(False)
+
     # set the backgorund image to 0 in the image bank
     # and the size (10x8 tiles of size 16x16)
     background = stage.Grid(image_bank_background, constants.SCREEN_GRID_X, constants.SCREEN_GRID_Y)
@@ -157,7 +166,7 @@ def game_scene():
 
     # a sprite that will be updated every frame
     # image at index 5 on (75, 66) on the screen
-    ship = stage.Sprite(image_bank_sprites, 5, 75, constants.SCREEN_Y - (2 * constants.SPRITE_SIZE))
+    ship = stage.Sprite(image_bank_sprites, 4, 75, constants.SCREEN_Y - (2 * constants.SPRITE_SIZE))
 
     # create a list of aliens
     aliens = []
@@ -251,6 +260,23 @@ def game_scene():
                 if aliens[alien_number].y > constants.SCREEN_Y:
                     aliens[alien_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
                     show_alien()
+
+        for laser_number in range(len(lasers)):
+            if lasers[laser_number].x > 0:
+                for alien_number in range(len(aliens)):
+                    if aliens[alien_number].x > 0:
+                        if stage.collide(lasers[laser_number].x + 6, lasers[laser_number].y + 2,
+                                         lasers[laser_number].x + 11, lasers[laser_number].y + 12,
+                                         aliens[alien_number].x + 1, aliens[alien_number].y,
+                                         aliens[alien_number].x + 15, aliens[alien_number].y + 15):
+                            # you hit an alien
+                            aliens[alien_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
+                            lasers[laser_number].move(constants.OFF_SCREEN_X, constants.OFF_SCREEN_Y)
+                            sound.stop()
+                            sound.play(boom_sound)
+                            show_alien()
+                            show_alien()
+                            score = score + 1
 
         # redraw Sprites
         game.render_sprites(aliens + lasers + [ship])
